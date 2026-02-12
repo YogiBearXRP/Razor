@@ -43,16 +43,49 @@ namespace Assistant.Core
             tree.SafeAction(s =>
             {
                 s.BeginUpdate();
+                try
+                {
+                    s.Nodes.Clear();
+                    s.Nodes.Add(new TreeNode(xDoc.DocumentElement.Name));
 
-                s.Nodes.Clear();
-                s.Nodes.Add(new TreeNode(xDoc.DocumentElement.Name));
+                    TreeNode tNode = s.Nodes[0];
+                    AddItemTreeNode(xDoc.DocumentElement, tNode);
 
-                TreeNode tNode = s.Nodes[0];
-                AddItemTreeNode(xDoc.DocumentElement, tNode);
+                    s.Nodes[0].Expand();
+                }
+                catch (Exception ex)
+                {
+                    Exception root = ex;
+                    while (root is TypeInitializationException tie && tie.InnerException != null)
+                        root = tie.InnerException;
 
-                s.Nodes[0].Expand();
+                    if (root is IOException)
+                    {
+                        MessageBox.Show(Engine.ActiveWindow,
+                            "Razor was unable to read Ultima Online art data files because one is locked by another process.\n\n" +
+                            "Common causes:\n- The UO patcher/updater is running\n- The client is still updating files\n\n" +
+                            "Fix: close the UO patcher/client, wait for updates to finish, then restart Razor.\n\n" +
+                            root.Message,
+                            "UO Data File Locked",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Warning);
+                    }
+                    else
+                    {
+                        MessageBox.Show(Engine.ActiveWindow,
+                            "Razor failed to load the staff item list.\n\n" + ex,
+                            "Staff Tools Error",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Warning);
+                    }
 
-                s.EndUpdate();
+                    // Leave the tree empty rather than crashing.
+                    s.Nodes.Clear();
+                }
+                finally
+                {
+                    s.EndUpdate();
+                }
             });
         }
         

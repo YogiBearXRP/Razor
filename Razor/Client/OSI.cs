@@ -486,7 +486,20 @@ namespace Assistant
                     m_OutSend = (Buffer*) (baseAddr + sizeof(Buffer) * 3);
                     m_TitleStr = (byte*) (baseAddr + sizeof(Buffer) * 4);
 
-                    SetServer(m_ServerIP, m_ServerPort);
+                    // Razor's native hook can optionally force all connect() calls to a single IP/port.
+                    // That behavior is useful for many private shards, but it breaks the official OSI
+                    // flow where the client connects to a login server (7775-7777) and then switches
+                    // to a shard/game server. If we keep forcing the login endpoint, the client can
+                    // appear to hang at "Connecting...".
+                    uint forcedServerIp = m_ServerIP;
+                    ushort forcedServerPort = m_ServerPort;
+                    if (forcedServerPort == 7775 || forcedServerPort == 7776 || forcedServerPort == 7777)
+                    {
+                        forcedServerIp = 0;
+                        forcedServerPort = 0;
+                    }
+
+                    SetServer(forcedServerIp, forcedServerPort);
 
                     CommMutex = new Mutex();
 #pragma warning disable 618
