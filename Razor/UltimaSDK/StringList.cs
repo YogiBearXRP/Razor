@@ -61,13 +61,25 @@ namespace Ultima
 
         private void LoadEntry(string path)
         {
-            if (Engine.ClientVersion.Major >= 7 && Engine.ClientVersion.Build >= 105)
+            // CliLoc files exist in multiple formats (and may be compressed). Historically we picked the
+            // parser based on client version, but that heuristic can be wrong (or unavailable early in startup).
+            // Try the preferred parser first, then fall back.
+            bool preferNew = Engine.ClientVersion.Major >= 7 && Engine.ClientVersion.Build >= 105;
+
+            try
             {
-                LoadNewEntryFormat(path);
+                if (preferNew)
+                    LoadNewEntryFormat(path);
+                else
+                    LoadOldEntryFormat(path);
             }
-            else
+            catch (Exception)
             {
-                LoadOldEntryFormat(path);
+                // Fallback to the other format.
+                if (preferNew)
+                    LoadOldEntryFormat(path);
+                else
+                    LoadNewEntryFormat(path);
             }
         }
 
@@ -93,7 +105,13 @@ namespace Ultima
                 {
                     int number = bin.ReadInt32();
                     byte flag = bin.ReadByte();
-                    int length = bin.ReadInt16();
+                    int length = bin.ReadUInt16();
+
+                    if (length < 0)
+                        throw new InvalidDataException("Invalid CliLoc entry length.");
+
+                    if (bin.BaseStream.Position + length > bin.BaseStream.Length)
+                        throw new EndOfStreamException("Unexpected end of CliLoc file.");
 
                     if (length > m_Buffer.Length)
                         m_Buffer = new byte[(length + 1023) & ~1023];
@@ -141,7 +159,7 @@ namespace Ultima
                 {
                     var number = reader.ReadInt32LE();
                     var flag = reader.ReadUInt8();
-                    var length = reader.ReadInt16LE();
+                    var length = (int) reader.ReadUInt16LE();
                     var text = string.Intern(reader.ReadUTF8(length));
 
                     m_StringTable[number] = text;
