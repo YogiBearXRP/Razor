@@ -365,8 +365,12 @@ namespace Assistant
 #if !DEBUG
 			AppDomain.CurrentDomain.UnhandledException +=
  new UnhandledExceptionEventHandler( CurrentDomain_UnhandledException );
-			Directory.SetCurrentDirectory( Config.GetInstallDirectory() );
 #endif
+
+			// Ensure our working directory is the same folder as Razor.exe so native DLLs
+			// (Crypt.dll/Loader.dll/Platform.dll) and data files can be found even when
+			// launched from Visual Studio or a shortcut with a different Start In.
+			Directory.SetCurrentDirectory( Config.GetInstallDirectory() );
 
             /* Load localization files */
             string defLang = Config.GetAppSetting<string>("DefaultLanguage");

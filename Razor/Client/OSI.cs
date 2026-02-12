@@ -897,7 +897,37 @@ namespace Assistant
 
         public override string GetClientVersion()
         {
-            return Marshal.PtrToStringAnsi(GetUOVersion());
+            try
+            {
+                return Marshal.PtrToStringAnsi(GetUOVersion());
+            }
+            catch (DllNotFoundException e)
+            {
+                MessageBox.Show(Engine.ActiveWindow,
+                    "Unable to load required native library 'Crypt.dll'.\n\n" +
+                    "Fix: ensure Crypt.dll (and Loader.dll / Platform.dll) are in the same folder as Razor.exe.\n" +
+                    $"Razor folder: {Config.GetInstallDirectory()}\n\n" +
+                    "If you built from source, build Razor.sln using Release|x86 (or Debug|x86) and run from bin\\Win32\\<Config>.\n\n" +
+                    e,
+                    "Missing Crypt.dll",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+
+                return "4.0.0.0";
+            }
+            catch (BadImageFormatException e)
+            {
+                MessageBox.Show(Engine.ActiveWindow,
+                    "Unable to load 'Crypt.dll' due to an architecture mismatch (x86 vs x64).\n\n" +
+                    "Fix: use the x86 build of Razor with the 32-bit OSI client.\n" +
+                    "Build Razor.sln using Release|x86 (or Debug|x86) and run from bin\\Win32\\<Config>.\n\n" +
+                    e,
+                    "Crypt.dll architecture mismatch",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+
+                return "4.0.0.0";
+            }
         }
 
         public override string GetUoFilePath()

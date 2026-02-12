@@ -34,7 +34,7 @@ namespace Ultima
 
         public ValueStringBuilder(int initialCapacity)
         {
-            _arrayToReturnToPool = ArrayPool<char>.Shared.Rent(initialCapacity);
+            _arrayToReturnToPool = System.Buffers.ArrayPool<char>.Shared.Rent(initialCapacity);
             _chars = _arrayToReturnToPool;
             _pos = 0;
         }
@@ -352,7 +352,7 @@ namespace Ultima
         {
             Debug.Assert(requiredAdditionalCapacity > 0);
 
-            char[] poolArray = ArrayPool<char>.Shared.Rent(Math.Max(_pos + requiredAdditionalCapacity, _chars.Length * 2));
+            char[] poolArray = System.Buffers.ArrayPool<char>.Shared.Rent(Math.Max(_pos + requiredAdditionalCapacity, _chars.Length * 2));
 
             _chars.CopyTo(poolArray);
 
@@ -360,7 +360,7 @@ namespace Ultima
             _chars = _arrayToReturnToPool = poolArray;
             if (toReturn != null)
             {
-                ArrayPool<char>.Shared.Return(toReturn);
+                System.Buffers.ArrayPool<char>.Shared.Return(toReturn);
             }
         }
 
@@ -371,7 +371,7 @@ namespace Ultima
             this = default; // for safety, to avoid using pooled array if this instance is erroneously appended to again
             if (toReturn != null)
             {
-                ArrayPool<char>.Shared.Return(toReturn);
+                System.Buffers.ArrayPool<char>.Shared.Return(toReturn);
             }
         }
     }

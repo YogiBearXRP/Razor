@@ -52,7 +52,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <FileAlignment>4096</FileAlignment>
     <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
@@ -660,6 +660,10 @@
     <PreBuildEvent>
     </PreBuildEvent>
     <PostBuildEvent>xcopy /S /Q /Y "$(SolutionDir)etc\*" "$(SolutionDir)bin\Win32\$(Configuration)\"
-xcopy /S /Q /Y "$(SolutionDir)etc\*" "$(SolutionDir)bin\x64\$(Configuration)\"</PostBuildEvent>
+xcopy /S /Q /Y "$(SolutionDir)etc\*" "$(SolutionDir)bin\x64\$(Configuration)\"
+
+if exist "$(SolutionDir)bin\Win32\$(Configuration)\Crypt.dll" copy /Y "$(SolutionDir)bin\Win32\$(Configuration)\Crypt.dll" "$(TargetDir)"
+if exist "$(SolutionDir)bin\Win32\$(Configuration)\Loader.dll" copy /Y "$(SolutionDir)bin\Win32\$(Configuration)\Loader.dll" "$(TargetDir)"
+if exist "$(SolutionDir)bin\Win32\$(Configuration)\Platform.dll" copy /Y "$(SolutionDir)bin\Win32\$(Configuration)\Platform.dll" "$(TargetDir)"</PostBuildEvent>
   </PropertyGroup>
 </Project>

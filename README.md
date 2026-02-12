@@ -32,6 +32,23 @@ If you need more help, [please go here](https://www.razorce.com/help) and review
 
 ## Razor Scripting Engine
 
+## Building From Source (Windows)
+
+Razor uses native helper DLLs (`Crypt.dll`, `Loader.dll`, `Platform.dll`) when running with the original OSI/Classic client. If you launch Razor from a folder that does not contain these DLLs, you may see errors like `DllNotFoundException: Unable to load DLL 'Crypt.dll'`.
+
+- Open `Razor.sln` (not just `Razor.csproj`) in Visual Studio
+- Build `Release|x86` (or `Debug|x86`)
+- Run `Razor.exe` from `bin\Win32\<Configuration>\` (the folder must contain the native DLLs)
+
+### Downloading A Build From Your Fork (GitHub Actions)
+
+If you just want a ready-to-run ZIP from your own fork (without setting up Visual Studio locally):
+
+- In your fork on GitHub, go to **Actions** → **Build Dev Preview** → **Run workflow**
+- When the workflow completes, download the artifact **Razor-dev-x86-preview** (for the OSI classic client)
+- Extract the ZIP to a user-writable folder (recommended: `C:\\Razor\\`)
+- Run `Razor.exe` from the extracted folder and configure the UO data directory to your OSI install
+
 Introduced in 1.6.4.2, Razor supports a command-based script language. For a comprehensive guide on the language and syntax, visit the [Razor Scripting Guide](https://www.razorce.com/guide/).
 
 ## Contributing & Code of Conduct

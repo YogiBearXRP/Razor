@@ -846,6 +846,29 @@ namespace Assistant
             }
             catch (Exception e)
             {
+                string nativeHint = string.Empty;
+                if (e is DllNotFoundException || e is BadImageFormatException)
+                {
+                    string dllName = null;
+                    if (e.Message != null)
+                    {
+                        if (e.Message.IndexOf("Crypt.dll", StringComparison.OrdinalIgnoreCase) >= 0)
+                            dllName = "Crypt.dll";
+                        else if (e.Message.IndexOf("Loader.dll", StringComparison.OrdinalIgnoreCase) >= 0)
+                            dllName = "Loader.dll";
+                        else if (e.Message.IndexOf("Platform.dll", StringComparison.OrdinalIgnoreCase) >= 0)
+                            dllName = "Platform.dll";
+                    }
+
+                    nativeHint =
+                        "\n\nThis usually means Razor cannot load one of its required native DLLs" +
+                        (dllName != null ? $" ({dllName})." : ".") +
+                        "\n\nFix:" +
+                        "\n- Ensure Crypt.dll, Loader.dll, and Platform.dll are in the same folder as Razor.exe" +
+                        $"\n  (current install folder: {Config.GetInstallDirectory()})" +
+                        "\n- If you built from source: build Razor.sln using Release|x86 (or Debug|x86) and run Razor.exe from bin\\Win32\\<Config>";
+                }
+
                 string fileName = "[CliLoc]";
                 try
                 {
@@ -856,7 +879,7 @@ namespace Assistant
                 }
 
                 new MessageDialog("Error loading CliLoc", true,
-                        "There was an exception while attempting to load '{0}':\n{1}", fileName, e)
+                        "There was an exception while attempting to load '{0}':\n{1}{2}", fileName, e, nativeHint)
                     .ShowDialog(Engine.ActiveWindow);
             }
 
