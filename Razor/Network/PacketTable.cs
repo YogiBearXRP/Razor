@@ -22,7 +22,7 @@ namespace Assistant
 {
     public static class PacketsTable
     {
-        private static readonly short[] _packetsTable = new short[255]
+        private static readonly short[] _packetsTable = new short[256]
         {
             0x0068, // 0x00
             0x0005, // 0x01
@@ -278,6 +278,7 @@ namespace Assistant
             0x02, // fb
             -1, // fc
             -1, // fd
+            -1, // fe
             -1 // ff
         };
 
