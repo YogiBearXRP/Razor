@@ -690,6 +690,21 @@ namespace Assistant
             get
             {
                 ushort iid = _itemId.Value;
+                // Prefer tiledata flags so we correctly detect doors across all
+                // art IDs (including newer clients/expansions and shard customizations).
+                // Fall back to the historical hardcoded ranges if tiledata is unavailable.
+                try
+                {
+                    if (iid < Ultima.TileData.ItemTable.Length)
+                    {
+                        return (Ultima.TileData.ItemTable[iid].Flags & Ultima.TileFlag.Door) != 0;
+                    }
+                }
+                catch
+                {
+                    // ignored - fall back below
+                }
+
                 return (iid >= 0x0675 && iid <= 0x06F6) || (iid >= 0x0821 && iid <= 0x0875) ||
                        (iid >= 0x1FED && iid <= 0x1FFC) ||
                        (iid >= 0x241F && iid <= 0x2424) || (iid >= 0x2A05 && iid <= 0x2A1C);
